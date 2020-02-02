@@ -3,9 +3,11 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Tracker</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 </head>
 <body>
     <nav class="navbar bg-dark header-text">
@@ -27,10 +29,15 @@
             <div class="col-sm-9 right-style section-sizing">
                 <br>
                 <div id="info-container-1">
-                    <div id="city-name-date"></div>
-                    <div id="humidty"></div>
-                    <div id="wind-speed"></div>
-                    <div id="UV-index"></div>
+                    <div id="city-name-date" class="inner-header"></div>
+                    <br>
+                    <div id="temperature" class="inner-content"></div>
+                    <br>
+                    <div id="humidity" class="inner-content"></div>
+                    <br>
+                    <div id="wind-speed" class="inner-content"></div>
+                    <br>
+                    <div id="UV-index" class="inner-content"></div>
                 </div>
                 <br>
                 <div id="info-container-2">
@@ -44,13 +51,37 @@
     </div>
     <script>
         /* To Do:
-        1. complete style + layout
+        1. complete style + layout (DONE)
         2. complete form button that pushes searches to history + save to local storage
-        3. have history buttons enact another search when clicked
+        3. have history buttons enact another search when clicked (should we set the query process as function query(), which we can then apply to the buttons?)
         4. push info on pertinent weather to top-right section
         5. push info on 5-day forecast to bottom-right section
         */
-    
+        let APIkey = "a0a7ba2d11c89621064f9cd380b6e76e";
+        let cityName;
+        let queryURL;
+        let now = moment().format('MMMM Do YYYY');
+
+        $("#submit-city").on("click", function(event) {
+            event.preventDefault();
+            cityName = $("#city").val();
+            queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&units=imperial&appid=" + APIkey;
+
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function(response) {
+                console.log(response);        
+                $("#city-name-date").text(`Welcome to ${response.name}, ${response.sys.country}! Today is ${now}.`);
+                $("#temperature").text(`The current temperature is ${response.main.temp} degrees Fahrenheit.`);
+                $("#humidity").text(`The humidity is currently at ${response.main.humidity}%.`);
+                $("#wind-speed").text(`The wind speed is currently blowing at ${response.wind.speed} mph.`);
+                $("#UV-index").text(`The UV index is at `);
+            });
+            
+        });
+
+
         
     </script>
 </body>

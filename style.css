@@ -32,6 +32,22 @@ h3 {
     height: 70%;
 }
 
+.inner-header {
+    font-size: 24px;
+    font-weight: bolder;
+    text-align: center;
+    background-color: darkgray;
+    color: white;
+    margin: 5px;
+}
+
+.inner-content {
+    font-size: 18px;
+    margin: 5px;
+    padding: 10px;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
 #history {
     background-color: white;
     height: 80%;
