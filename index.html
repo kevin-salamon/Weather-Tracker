@@ -3,8 +3,55 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
+    <nav class="navbar bg-dark header-text">
+        <span class="navbar-item mb-0 h1 position-header-text">Your Weather Tracking Application</span>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3 left-style section-sizing">
+                <br>
+                <h6>Search for a city:</h6>
+                <form id="search-form">
+                    <input placeholder="City" id="city">
+                    <button id="submit-city" class="bg-primary">🔍</button>
+                </form>
+                <br>
+                <div id="history"></div>
+            </div>
+            <div class="col-sm-9 right-style section-sizing">
+                <br>
+                <div id="info-container-1">
+                    <div id="city-name-date"></div>
+                    <div id="humidty"></div>
+                    <div id="wind-speed"></div>
+                    <div id="UV-index"></div>
+                </div>
+                <br>
+                <div id="info-container-2">
+                    <h3>5-Day Forecast</h3>
+                    <div class="five-day-container"></div>
+                </div>
+                <br>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        /* To Do:
+        1. complete style + layout
+        2. complete form button that pushes searches to history + save to local storage
+        3. have history buttons enact another search when clicked
+        4. push info on pertinent weather to top-right section
+        5. push info on 5-day forecast to bottom-right section
+        */
     
+        
+    </script>
 </body>
 </html>
