@@ -30,6 +30,7 @@
                 <br>
                 <div id="info-container-1">
                     <div id="city-name-date" class="inner-header"></div>
+                    <img id="weather-icon">
                     <br>
                     <div id="temperature" class="inner-content"></div>
                     <br>
@@ -38,39 +39,39 @@
                     <div id="wind-speed" class="inner-content"></div>
                     <br>
                     <div id="UV-index" class="inner-content"></div>
-                    <div id="UV" class="rounded"></div>
+                    <div id="UV"></div>
                 </div>
                 <br>
                 <div id="info-container-2">
                     <h3>5-Day Forecast</h3>
                     <div id="five-day-container">
-                        <div class="five-day-box">
+                        <div class="five-day-box rounded">
                             <u><div id="day1-date"></div></u>
-                            <div id="day1-pic"></div>
+                            <img id="day1-pic"></img>
                             <div id="day1-temp"></div>
                             <div id="day1-humidity"></div>
                         </div>
-                        <div class="five-day-box">
+                        <div class="five-day-box rounded">
                             <u><div id="day2-date"></div></u>
-                            <div id="day2-pic"></div>
+                            <img id="day2-pic"></img>
                             <div id="day2-temp"></div>
                             <div id="day2-humidity"></div>
                         </div>
-                        <div class="five-day-box">
+                        <div class="five-day-box rounded">
                             <u><div id="day3-date"></div></u>
-                            <div id="day3-pic"></div>
+                            <img id="day3-pic"></img>
                             <div id="day3-temp"></div>
                             <div id="day3-humidity"></div>
                         </div>
-                        <div class="five-day-box">
+                        <div class="five-day-box rounded">
                             <u><div id="day4-date"></div></u>
-                            <div id="day4-pic"></div>
+                            <img id="day4-pic"></img>
                             <div id="day4-temp"></div>
                             <div id="day4-humidity"></div>
                         </div>
-                        <div class="five-day-box">
+                        <div class="five-day-box rounded">
                             <u><div id="day5-date"></div></u>
-                            <div id="day5-pic"></div>
+                            <img id="day5-pic"></img>
                             <div id="day5-temp"></div>
                             <div id="day5-humidity"></div>
                         </div>
@@ -84,7 +85,6 @@
     <script>
         /* To Do:
         2. complete form button that pushes searches to history + save to local storage
-        3. have history buttons enact another search when clicked (should we set the query process as function query(), which we can then apply to the buttons?)
         4. add weather emojis
         */
         let APIkey = "a0a7ba2d11c89621064f9cd380b6e76e";
@@ -95,6 +95,20 @@
         let now = moment().format('MMMM Do YYYY');
         let fiveDayContainer = document.getElementById("five-day-container");
         fiveDayContainer.style.display = "none";
+        let cities = [];
+        let citiesString;
+        let history = localStorage.getItem("cities");
+        let oneDayIcon = document.getElementById("weather-icon");
+        oneDayIcon.style.display = "none";
+        /*
+        let cityHistory = JSON.parse(history);
+        for (i = 0; i < cityHistory.length; i++) {
+            let newDiv = $("<div>");
+            newDiv.attr("class", "history-box");
+            newDiv.attr("value", cityHistory[i].name);
+            newDiv.text(cityHistory[i].name);
+            $("#history").append(newDiv);
+        } */
 
         $("#submit-city").on("click", function(event) {
             event.preventDefault();
@@ -103,7 +117,7 @@
             let longitude;
             let latitude;
             fiveDayContainer.style.display = "block";
-            fiveDayContainer.style.marginTop = "5%";
+            oneDayIcon.style.display = "block";
 
             $.ajax({
                 url: queryURL,
@@ -112,7 +126,9 @@
                 console.log(response);    
                 longitude = response.coord.lon;
                 latitude = response.coord.lat;
-                $("#city-name-date").text(`Welcome to ${response.name}, ${response.sys.country}! Today is ${now}.`);
+                icon = "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png";
+                $("#city-name-date").text(`${response.name}, ${response.sys.country}; ${now}`);
+                $("#weather-icon").attr("src", icon);
                 $("#temperature").text(`The current temperature is ${response.main.temp} degrees Fahrenheit.`);
                 $("#humidity").text(`The humidity is currently at ${response.main.humidity}%.`);
                 $("#wind-speed").text(`The wind speed is currently blowing at ${response.wind.speed} mph.`);
@@ -124,58 +140,40 @@
 
                 UVQueryURL = "https://api.openweathermap.org/data/2.5/uvi?appid=" + APIkey + "&lat=" + latitude + "&lon=" + longitude;
                 fiveDayQueryURL = "https://api.openweathermap.org/data/2.5/forecast?appid=" + APIkey + "&lat=" + latitude + "&lon=" + longitude;
+                citiesString = JSON.stringify(response);
+                cities.push(citiesString);
+                localStorage.setItem("cities", cities);
 
                 $.ajax({
                     url: fiveDayQueryURL,
                     method: "GET"
                 }).then(function(response) {
                     console.log(response);
+                    day1pic = "https://openweathermap.org/img/wn/" + response.list[0].weather[0].icon + "@2x.png";
+                    day2pic = "https://openweathermap.org/img/wn/" + response.list[8].weather[0].icon + "@2x.png";
+                    day3pic = "https://openweathermap.org/img/wn/" + response.list[16].weather[0].icon + "@2x.png";
+                    day4pic = "https://openweathermap.org/img/wn/" + response.list[24].weather[0].icon + "@2x.png";
+                    day5pic = "https://openweathermap.org/img/wn/" + response.list[32].weather[0].icon + "@2x.png";
                     $("#day1-date").text(moment().format("MMM Do YYYY"));
-                    $("#day1-pic").text(`Sky: ${response.list[4].weather[0].description}`);
-
-                    /*
-                    if (response.list[4].weather[0].description === "clear sky") {
-                        $("day1-pic").attr("src", "images/clearsky.png")
-                    } else if (response.list[4].weather[0].description === "few clouds") {
-                        $("day1-pic").attr("src", "images/fewclouds.png")
-                    } else if (response.list[4].weather[0].description === "scattered clouds") {
-                        $("day1-pic").attr("src", "images/scatteredclouds.png")
-                    } else if (response.list[4].weather[0].description === "broken clouds") {
-                        $("day1-pic").attr("src", "images/brokenclouds.png")
-                    } else if (response.list[4].weather[0].description === "shower rain") {
-                        $("day1-pic").attr("src", "images/showerrain.png")
-                    } else if (response.list[4].weather[0].description === "rain") {
-                        $("day1-pic").attr("src", "images/rain.png")
-                    } else if (response.list[4].weather[0].description === "thunderstorm") {
-                        $("day1-pic").attr("src", "images/thunderstorm.png")
-                    } else if (response.list[4].weather[0].description === "snow") {
-                        $("day1-pic").attr("src", "images/snow.png")
-                    } else if (response.list[4].weather[0].description === "mist") {
-                        $("day1-pic").attr("src", "images/mist.png")
-                    } else if (response.list[4].weather[0].description === "overcast clouds") {
-                        $("day1-pic").attr("src", "images/overcastclouds.png")
-                    } else {
-                        $("#day1-pic").text(`Sky: ${response.list[4].weather[0].description}`);
-                    } */
-
-                    $("#day1-temp").text(`Temp: ${((parseInt(response.list[4].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day1-humidity").text(`Humidity: ${response.list[4].main.humidity}%`);
+                    $("#day1-pic").attr("src", day1pic);
+                    $("#day1-temp").text(`Temp: ${((parseInt(response.list[0].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day1-humidity").text(`Humidity: ${response.list[0].main.humidity}%`);
                     $("#day2-date").text(moment().add(1, 'days').format("MMM Do YYYY"));
-                    $("#day2-pic").text(`Sky: ${response.list[12].weather[0].description}`);
-                    $("#day2-temp").text(`Temp: ${((parseInt(response.list[12].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day2-humidity").text(`Humidity: ${response.list[12].main.humidity}%`);
+                    $("#day2-pic").attr("src", day2pic);
+                    $("#day2-temp").text(`Temp: ${((parseInt(response.list[8].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day2-humidity").text(`Humidity: ${response.list[8].main.humidity}%`);
                     $("#day3-date").text(moment().add(2, 'days').format("MMM Do YYYY"));
-                    $("#day3-pic").text(`Sky: ${response.list[20].weather[0].description}`);
-                    $("#day3-temp").text(`Temp: ${((parseInt(response.list[20].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day3-humidity").text(`Humidity: ${response.list[20].main.humidity}%`);
+                    $("#day3-pic").attr("src", day3pic);
+                    $("#day3-temp").text(`Temp: ${((parseInt(response.list[16].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day3-humidity").text(`Humidity: ${response.list[16].main.humidity}%`);
                     $("#day4-date").text(moment().add(3, 'days').format("MMM Do YYYY"));
-                    $("#day4-pic").text(`Sky: ${response.list[28].weather[0].description}`);
-                    $("#day4-temp").text(`Temp: ${((parseInt(response.list[28].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day4-humidity").text(`Humidity: ${response.list[28].main.humidity}%`);
+                    $("#day4-pic").attr("src", day4pic);
+                    $("#day4-temp").text(`Temp: ${((parseInt(response.list[24].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day4-humidity").text(`Humidity: ${response.list[24].main.humidity}%`);
                     $("#day5-date").text(moment().add(4, 'days').format("MMM Do YYYY"));
-                    $("#day5-pic").text(`Sky: ${response.list[36].weather[0].description}`);
-                    $("#day5-temp").text(`Temp: ${((parseInt(response.list[36].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day5-humidity").text(`Humidity: ${response.list[36].main.humidity}%`);
+                    $("#day5-pic").attr("src", day5pic);
+                    $("#day5-temp").text(`Temp: ${((parseInt(response.list[32].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day5-humidity").text(`Humidity: ${response.list[32].main.humidity}%`);
                 });
 
                 $.ajax({
@@ -185,6 +183,7 @@
                     console.log(response);
                     $("#UV-index").text(`The UV index is at: `);
                     $("#UV").text(response.value);
+                    $("#UV").removeAttr("class");
                     if (response.value < 4.00) {
                         $("#UV").attr("class", "low");
                     } else if (response.value >= 4.00 && response.value < 8.00) {
@@ -215,7 +214,7 @@
             let longitude;
             let latitude;
             fiveDayContainer.style.display = "block";
-            fiveDayContainer.style.marginTop = "5%";
+            oneDayIcon.style.display = "block";
 
             $.ajax({
                 url: queryURL,
@@ -237,26 +236,31 @@
                     method: "GET"
                 }).then(function(response) {
                     console.log(response);
+                    day1pic = "https://openweathermap.org/img/wn/" + response.list[0].weather[0].icon + "@2x.png";
+                    day2pic = "https://openweathermap.org/img/wn/" + response.list[8].weather[0].icon + "@2x.png";
+                    day3pic = "https://openweathermap.org/img/wn/" + response.list[16].weather[0].icon + "@2x.png";
+                    day4pic = "https://openweathermap.org/img/wn/" + response.list[24].weather[0].icon + "@2x.png";
+                    day5pic = "https://openweathermap.org/img/wn/" + response.list[32].weather[0].icon + "@2x.png";
                     $("#day1-date").text(moment().format("MMM Do YYYY"));
-                    $("#day1-pic").text(`Sky: ${response.list[4].weather[0].description}`);
-                    $("#day1-temp").text(`Temp: ${((parseInt(response.list[4].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day1-humidity").text(`Humidity: ${response.list[4].main.humidity}%`);
+                    $("#day1-pic").attr("src", day1pic);
+                    $("#day1-temp").text(`Temp: ${((parseInt(response.list[0].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day1-humidity").text(`Humidity: ${response.list[0].main.humidity}%`);
                     $("#day2-date").text(moment().add(1, 'days').format("MMM Do YYYY"));
-                    $("#day2-pic").text(`Sky: ${response.list[12].weather[0].description}`);
-                    $("#day2-temp").text(`Temp: ${((parseInt(response.list[12].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day2-humidity").text(`Humidity: ${response.list[12].main.humidity}%`);
+                    $("#day2-pic").attr("src", day2pic);
+                    $("#day2-temp").text(`Temp: ${((parseInt(response.list[8].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day2-humidity").text(`Humidity: ${response.list[8].main.humidity}%`);
                     $("#day3-date").text(moment().add(2, 'days').format("MMM Do YYYY"));
-                    $("#day3-pic").text(`Sky: ${response.list[20].weather[0].description}`);
-                    $("#day3-temp").text(`Temp: ${((parseInt(response.list[20].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day3-humidity").text(`Humidity: ${response.list[20].main.humidity}%`);
+                    $("#day3-pic").attr("src", day3pic);
+                    $("#day3-temp").text(`Temp: ${((parseInt(response.list[16].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day3-humidity").text(`Humidity: ${response.list[16].main.humidity}%`);
                     $("#day4-date").text(moment().add(3, 'days').format("MMM Do YYYY"));
-                    $("#day4-pic").text(`Sky: ${response.list[28].weather[0].description}`);
-                    $("#day4-temp").text(`Temp: ${((parseInt(response.list[28].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day4-humidity").text(`Humidity: ${response.list[28].main.humidity}%`);
+                    $("#day4-pic").attr("src", day4pic);
+                    $("#day4-temp").text(`Temp: ${((parseInt(response.list[24].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day4-humidity").text(`Humidity: ${response.list[24].main.humidity}%`);
                     $("#day5-date").text(moment().add(4, 'days').format("MMM Do YYYY"));
-                    $("#day5-pic").text(`Sky: ${response.list[36].weather[0].description}`);
-                    $("#day5-temp").text(`Temp: ${((parseInt(response.list[36].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
-                    $("#day5-humidity").text(`Humidity: ${response.list[36].main.humidity}%`);
+                    $("#day5-pic").attr("src", day5pic);
+                    $("#day5-temp").text(`Temp: ${((parseInt(response.list[32].main.temp) * 1.8) - 459.67).toFixed(2)}°F`);
+                    $("#day5-humidity").text(`Humidity: ${response.list[32].main.humidity}%`);
                 });
 
                 $.ajax({
@@ -266,6 +270,14 @@
                     console.log(response);
                     $("#UV-index").text(`The UV index is at: `);
                     $("#UV").text(response.value);
+                    $("#UV").removeAttr("class");
+                    if (response.value < 4.00) {
+                        $("#UV").attr("class", "low");
+                    } else if (response.value >= 4.00 && response.value < 8.00) {
+                        $("#UV").attr("class", "medium");
+                    } else {
+                        $("#UV").attr("class", "high");
+                    }
                 });
 
                 
