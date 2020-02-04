@@ -83,10 +83,8 @@
         </div>
     </div>
     <script>
-        /* To Do:
-        2. complete form button that pushes searches to history + save to local storage
-        4. add weather emojis
-        */
+        
+        // defining global variables, turning off display for currently unused elements
         let APIkey = "a0a7ba2d11c89621064f9cd380b6e76e";
         let cityName;
         let queryURL;
@@ -100,16 +98,9 @@
         let history = localStorage.getItem("cities");
         let oneDayIcon = document.getElementById("weather-icon");
         oneDayIcon.style.display = "none";
-        /*
-        let cityHistory = JSON.parse(history);
-        for (i = 0; i < cityHistory.length; i++) {
-            let newDiv = $("<div>");
-            newDiv.attr("class", "history-box");
-            newDiv.attr("value", cityHistory[i].name);
-            newDiv.text(cityHistory[i].name);
-            $("#history").append(newDiv);
-        } */
 
+
+        // submit button for search bar
         $("#submit-city").on("click", function(event) {
             event.preventDefault();
             cityName = $("#city").val();
@@ -119,6 +110,7 @@
             fiveDayContainer.style.display = "block";
             oneDayIcon.style.display = "block";
 
+            //query current forecast
             $.ajax({
                 url: queryURL,
                 method: "GET"
@@ -138,12 +130,14 @@
                 newDiv.text(response.name);
                 $("#history").append(newDiv);
 
+                //set relative variables for use in other queries
                 UVQueryURL = "https://api.openweathermap.org/data/2.5/uvi?appid=" + APIkey + "&lat=" + latitude + "&lon=" + longitude;
                 fiveDayQueryURL = "https://api.openweathermap.org/data/2.5/forecast?appid=" + APIkey + "&lat=" + latitude + "&lon=" + longitude;
                 citiesString = JSON.stringify(response);
                 cities.push(citiesString);
                 localStorage.setItem("cities", cities);
 
+                //query five-day forecast
                 $.ajax({
                     url: fiveDayQueryURL,
                     method: "GET"
@@ -176,6 +170,7 @@
                     $("#day5-humidity").text(`Humidity: ${response.list[32].main.humidity}%`);
                 });
 
+                //query UV index
                 $.ajax({
                     url: UVQueryURL,
                     method: "GET"
@@ -197,18 +192,14 @@
 
 
 
-
+            //declare function of history buttons
         $(".history-box").on("click", function(event) {
-            event.preventDefault();
             cityName = $(this).attr("value");
-            console.log(cityName);
             loadWeather();
         });
-            /*
-                FOR THE ERROR MESSAGES, SAY (if response.message == "city not found") then output it to screen
-            */
         });
 
+        //repeats functionality of submit button for use in history buttons; however, clicking a button does not create another button in the history, unlike the submit button
         function loadWeather() {
             queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&units=imperial&appid=" + APIkey;
             let longitude;
